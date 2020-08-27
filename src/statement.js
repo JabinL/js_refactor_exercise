@@ -36,6 +36,19 @@ function calculateVolumeCredits(perf, play) {
   return volumeCredits;
 }
 
+function createStatementData(invoice, plays) {
+  let volumeCredits = 0;
+  let data = Object.assign([], invoice);
+  data.performances.map(perf => {
+    volumeCredits += calculateVolumeCredits(perf, plays[perf.playID])
+    perf.thisAmount = calculateCurrentAmount(perf, plays[perf.playID])
+  })
+  data.totalAmount = data.performances.reduce((total, perf) => total + perf.thisAmount, 0);
+  data.volumeCredits = volumeCredits;
+  data.plays = plays;
+  return data;
+}
+
 function statement (invoice, plays) {
   let totalAmount = 0;
   let volumeCredits = 0;
