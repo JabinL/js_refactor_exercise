@@ -48,7 +48,15 @@ function createStatementData(invoice, plays) {
   data.plays = plays;
   return data;
 }
-
+function renderStatmentText(data) {
+  let result = `Statement for ${data.customer}\n`;
+  for (const perf of data.performances) {
+    result += `${data.plays[perf.playID].name}:${format(perf.thisAmount)} (${perf.audience} seats)\n`;
+  }
+  result += `Amount owed is ${format(data.totalAmount)}\n`;
+  result += `You earned ${data.volumeCredits} credits \n`;
+  return result;
+}
 function statement (invoice, plays) {
   let totalAmount = 0;
   let volumeCredits = 0;
