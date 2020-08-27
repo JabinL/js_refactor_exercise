@@ -57,13 +57,34 @@ function renderStatmentText(data) {
   result += `You earned ${data.volumeCredits} credits \n`;
   return result;
 }
+
+function renderStatementHtml(data) {
+  let result = `<h1>Statement for ${data.customer}</h1>\n` +
+      '<table>\n' +
+      '<tr><th>play</th><th>seats</th><th>cost</th></tr>';
+  for (const perf of data.performances) {
+    result += `<tr><td>${data.plays[perf.playID].name}</td><td>${perf.audience}</td><td>${format(perf.thisAmount)}</td></tr>\n`;
+  }
+  result += '</table>\n' +
+      `<p>Amount owed is <em>${format(data.totalAmount)}</em></p>\n` +
+      `<p>You earned <em>${data.volumeCredits}</em> credits</p>\n`
+
+  return result
+
+}
 function statement (invoice, plays) {
   let data = createStatementData(invoice, plays);
   return renderStatmentText(data);
 }
 
+const renderHtml = (invoice, plays) => {
 
+  let data = createStatementData(invoice, plays);
+
+  return renderStatementHtml(data);
+}
 
 module.exports = {
   statement,
+  renderHtml
 };
