@@ -4,7 +4,7 @@ function format(amount) {
     currency: 'USD',
     minimumFractionDigits: 2,
   }).format;
-  return format(amount);
+  return format(amount/100);
 }
 
 function calculateAmount(play, perf) {
@@ -41,7 +41,7 @@ function createStatementData(invoice, plays) {
   let data = Object.assign([], invoice);
   data.performances.map(perf => {
     volumeCredits += calculateVolumeCredits(perf, plays[perf.playID])
-    perf.thisAmount = calculateCurrentAmount(perf, plays[perf.playID])
+    perf.thisAmount = calculateAmount(plays[perf.playID],perf )
   })
   data.totalAmount = data.performances.reduce((total, perf) => total + perf.thisAmount, 0);
   data.volumeCredits = volumeCredits;
@@ -51,29 +51,18 @@ function createStatementData(invoice, plays) {
 function renderStatmentText(data) {
   let result = `Statement for ${data.customer}\n`;
   for (const perf of data.performances) {
-    result += `${data.plays[perf.playID].name}:${format(perf.thisAmount)} (${perf.audience} seats)\n`;
+    result += ` ${data.plays[perf.playID].name}: ${format(perf.thisAmount)} (${perf.audience} seats)\n`;
   }
   result += `Amount owed is ${format(data.totalAmount)}\n`;
   result += `You earned ${data.volumeCredits} credits \n`;
   return result;
 }
 function statement (invoice, plays) {
-  let totalAmount = 0;
-  let volumeCredits = 0;
-  let result = `Statement for ${invoice.customer}\n`;
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
-    let thisAmount = calculateAmount(play, perf);
-
-    volumeCredits += calculateVolumeCredits( perf, play);
-    //print line for this order
-    result += ` ${play.name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
-    totalAmount += thisAmount;
-  }
-  result += `Amount owed is ${format(totalAmount / 100)}\n`;
-  result += `You earned ${volumeCredits} credits \n`;
-  return result;
+  let data = createStatementData(invoice, plays);
+  return renderStatmentText(data);
 }
+
+
 
 module.exports = {
   statement,
